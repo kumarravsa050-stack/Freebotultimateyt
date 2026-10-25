@@ -1,0 +1,19 @@
+FROM python:3.11-slim
+
+RUN apt-get update && \
+    apt-get install -y ffmpeg curl unzip ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://deno.land/install.sh | DENO_INSTALL=/usr/local sh && \
+    deno --version
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -U pip && \
+    pip install --no-cache-dir -U -r requirements.txt && \
+    pip install --no-cache-dir -U --pre "yt-dlp[default,curl-cffi]" yt-dlp-ejs
+
+COPY . .
+
+CMD ["python", "bot.py"]
